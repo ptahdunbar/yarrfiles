@@ -21,7 +21,7 @@ install() {
 
 	if [ -d $YARRF ]; then
 	    echo "Yarrfiles is already installed. You'll need to remove ${YARRF} if you'd like to reinstall."
-#	    exit
+	    exit
 	fi
 	
 	# If this is coming from a curl or wget
@@ -70,10 +70,12 @@ download_repo() {
 	cd $YARRF && git submodule init && git submodule foreach git pull origin master
 }
 
-uninstall() {
+uninstall() {	
 	echo
 	echo "Removing ${YARRF}"
-	echo
+
+	read -p "Are you sure you want to continue? (y|N) "
+	[ "$REPLY" != "y" ] && echo "Aborting..."; exit
 	
 	if [[ -d $YARRF ]]; then
 	  rm -rf $YARRF
