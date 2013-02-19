@@ -6,6 +6,9 @@ YARRF='~/.yarrfiles'
 # get the current working directory so we can switch back if nessecary.
 CWD=`pwd`
 
+# Flag to determine what type of install were performing.
+RAW='0'
+
 # installs yarrf
 install() {
 	echo
@@ -21,37 +24,44 @@ install() {
 	    echo "Yarrfiles is already installed. You'll need to remove ~/${YARRF} if you'd like to install."
 	    exit
 	fi
-
-	echo "Cloning Yarrfiles..."
-	# hash git >/dev/null && /usr/bin/env git clone https://github.com/ptahdunbar/yarrfiles.git $YARRF || {
-	#    echo "git is not installed. installation failed."
-	#    exit
-	# }
 	
-	# Init submodules.
-	# cd $YARRF && git submodule init && git submodule foreach git pull origin master
+	# If this is coming from a curl or wget
+	if [ $RAW -eq 1 ]; then
+		download_repo
+	fi
 
 	echo "Looking for an existing ~/.$cshrc config..."
 	echo
 
 	if [ -f ~/.$cshrc ] || [ -h ~/.$cshrc ]; then
 	    echo "Found: ~/.${cshrc} —— Backing up to ~/.${cshrc}.pre-yarrfiles"
-	#    mv ~/.$cshrc ~/.$(cshrc).pre-yarrfiles
+	    mv ~/.$cshrc ~/.$(cshrc).pre-yarrfiles
 	fi
 
 	echo "Using: ~/.yarrfiles/templates/.${cshrc} config —— adding it to ~/.${cshrc}"
-	#cp ~/.yarrfiles/templates/.$csh ~/.$cshrc
+	cp ~/.yarrfiles/templates/.$csh ~/.$cshrc
 	
 	# if bash_profile exists, cat 'source bashrc'.
 
 	echo "Sourced: ~/.${cshrc}"
-	#source $cshrc
+	source $cshrc
 	
 	cd $CWD
 	
 	echo
 	echo "Yarr ye scury dog, installation successful! (-_O)"
 	echo
+}
+
+download_repo() {
+	echo "Cloning Yarrfiles..."
+	hash git >/dev/null && /usr/bin/env git clone git@github.com:ptahdunbar/yarrfiles.git $YARRF || {
+	   echo "git is not installed. installation failed."
+	   exit
+	}
+
+	# Init submodules.
+	cd $YARRF && git submodule init && git submodule foreach git pull origin master
 }
 
 uninstall() {
@@ -130,16 +140,20 @@ usage()
 }
 
 case "$1" in
---install|-i)
+--install)
+	RAW='1'
 	install
 	;;
---update|-u)
+--init)
+	install
+	;;
+--update)
 	update
 	;;
---status|-s)
+--status)
 	status
 	;;
---uninstall|-rm)
+--uninstall)
 	uninstall
 	;;
 *)
