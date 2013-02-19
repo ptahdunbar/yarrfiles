@@ -22,4 +22,3 @@ source $YARRF/yarrf.sh
 
 # Example aliases
 # alias bashconfig='vi ~/.bashrc'
-

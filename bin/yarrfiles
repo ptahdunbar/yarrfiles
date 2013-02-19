@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # set the directory of Yarrfiles.
-YARRF='~/.yarrfiles'
+YARRF=`echo /Users/$(whoami)/.yarrfiles`
 
 # get the current working directory so we can switch back if nessecary.
 CWD=`pwd`
@@ -20,8 +20,8 @@ install() {
 	cshrc="${csh}${suffix}"
 
 	if [ -d $YARRF ]; then
-	    echo "Yarrfiles is already installed. You'll need to remove ~/${YARRF} if you'd like to install."
-	    exit
+	    echo "Yarrfiles is already installed. You'll need to remove ${YARRF} if you'd like to reinstall."
+#	    exit
 	fi
 	
 	# If this is coming from a curl or wget
@@ -31,12 +31,15 @@ install() {
 
 	echo "Looking for an existing ~/.$cshrc config..."
 	if [ -f ~/.$cshrc ] || [ -h ~/.$cshrc ]; then
-	    echo "Found: ~/.${cshrc} —— Backing up to ~/.${cshrc}.pre-yarrfiles"
+	    echo "Found ~/.${cshrc} —— Backing up to ~/.${cshrc}.pre-yarrfiles"
 		mv ~/.${cshrc} ~/.${cshrc}.pre-yarrfiles
 	fi
 
-	echo "Using: ~/.yarrfiles/templates/.${cshrc} config —— adding it to ~/.${cshrc}"
+	echo "Using ~/.yarrfiles/templates/.${cshrc} config —— adding it to ~/.${cshrc}"
 	cp ~/.yarrfiles/templates/$cshrc ~/.$cshrc
+	
+	echo "Copying your current PATH and adding it to the end of ~/.${cshrc} for you."
+	echo "export PATH=${PATH}:${YARRF}/bin:${YARRF}/custom/bin" >> ~/.${cshrc}
 
 	# if bash_profile exists, cat 'source bashrc'.
 	if [ $csh == 'bash' ]; then
@@ -53,7 +56,7 @@ install() {
 	echo "Ye scury dog, installation successful! (-_O)"
 	echo
 
-	source ~/.$cshrc
+	. ~/.$cshrc
 }
 
 download_repo() {
