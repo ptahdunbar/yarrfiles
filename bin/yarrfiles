@@ -9,21 +9,46 @@ CWD=`pwd`
 # Flag to determine what type of install were performing.
 RAW='0'
 
+# Force a command to run.
+FORCE='0'
+
+# Default command to run.
+COMMAND='usage'
+
+usage()
+{
+	cat <<USAGE
+Usage: yarrfiles options
+
+Sail'n wit me booty across the seven seas.. Arr! Prepare to be Boarded!! -_O
+
+OPTIONS:
+   -h|--help		Show this message
+   -i|--install		Install yarrfiles
+   -u|--update		Update yarrfiles via git
+   -x|--uninstall	Uninstall yarrfiles
+
+USAGE
+}
+
 # installs yarrf
 install() {
-	echo
 	echo "Installing Yarrfiles!"
 	echo
 	
 	csh=`basename $SHELL`
 	suffix='rc'
 	cshrc="${csh}${suffix}"
-
-	if [ -d $YARRF ]; then
+	
+	if [ -d $YARRF ] && [ $FORCE == "0" ]; then
 	    echo "Yarrfiles is already installed. You'll need to remove ${YARRF} if you'd like to reinstall."
 	    exit
 	fi
 	
+	echo "install"
+	
+	exit
+
 	# If this is coming from a curl or wget
 	if [ $RAW -eq 1 ]; then
 		download_repo
@@ -70,8 +95,8 @@ download_repo() {
 	cd $YARRF && git submodule init && git submodule foreach git pull origin master
 }
 
-uninstall() {	
-	echo
+# TODO Refactor function
+uninstall() {
 	echo "Removing ${YARRF}"
 
 	read -p "Are you sure you want to continue? (y|N) "
@@ -119,7 +144,6 @@ uninstall() {
 }
 
 update() {
-	echo
 	echo "Updating Yarrfiles!"
 	echo
 
@@ -136,34 +160,28 @@ update() {
 	cd $CWD
 }
 
-# displays loaded scripts and plugins.
-status() {
-	echo "Status: command not yet implemented."
-}
+while getopts ':hifux' OPTION
+do
+	case $OPTION in
+		i|install)
+			RAW='1'
+			COMMAND='install'
+			;;
+		init)
+			COMMAND='install'
+			;;
+		f|force)
+			FORCE='1'
+			;;
+		u|update)
+		 	COMMAND='install'
+			;;
+		x|uninstall)
+			COMMAND='uninstall'
+			;;
+     esac
+done
 
-usage()
-{
-	echo "Usage: $0 --install|--update|--status|--uninstall|--usage"
-}
+$COMMAND
 
-case "$1" in
---install)
-	RAW='1'
-	install
-	;;
---init)
-	install
-	;;
---update)
-	update
-	;;
---status)
-	status
-	;;
---uninstall)
-	uninstall
-	;;
-*)
-	usage
-	exit 1
-esac
+exit 1
