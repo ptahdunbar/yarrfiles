@@ -15,10 +15,9 @@ install() {
 	echo "Installing Yarrfiles!"
 	echo
 	
-	# clones the get repo.
 	csh=`basename $SHELL`
 	suffix='rc'
-	cshrc="$csh$suffix"
+	cshrc="${csh}${suffix}"
 
 	if [ -d $YARRF ]; then
 	    echo "Yarrfiles is already installed. You'll need to remove ~/${YARRF} if you'd like to install."
@@ -31,26 +30,30 @@ install() {
 	fi
 
 	echo "Looking for an existing ~/.$cshrc config..."
-	echo
-
 	if [ -f ~/.$cshrc ] || [ -h ~/.$cshrc ]; then
 	    echo "Found: ~/.${cshrc} —— Backing up to ~/.${cshrc}.pre-yarrfiles"
-	    mv ~/.$cshrc ~/.$(cshrc).pre-yarrfiles
+		mv ~/.${cshrc} ~/.${cshrc}.pre-yarrfiles
 	fi
 
 	echo "Using: ~/.yarrfiles/templates/.${cshrc} config —— adding it to ~/.${cshrc}"
-	cp ~/.yarrfiles/templates/.$csh ~/.$cshrc
-	
-	# if bash_profile exists, cat 'source bashrc'.
+	cp ~/.yarrfiles/templates/$cshrc ~/.$cshrc
 
-	echo "Sourced: ~/.${cshrc}"
-	source $cshrc
+	# if bash_profile exists, cat 'source bashrc'.
+	if [ $csh == 'bash' ]; then
+		if [ -f ~/.bash_profile ] || [ -h ~/.bash_profile ]; then
+			echo "Sourcing ~/.bashrc in ~/.bash_profile"
+		    echo "source ~/.bashrc" >> bash_profile
+			cat "source ~/.bashrc" >> bash_profile
+		fi
+	fi
 	
 	cd $CWD
 	
 	echo
-	echo "Yarr ye scury dog, installation successful! (-_O)"
+	echo "Ye scury dog, installation successful! (-_O)"
 	echo
+
+	source ~/.$cshrc
 }
 
 download_repo() {

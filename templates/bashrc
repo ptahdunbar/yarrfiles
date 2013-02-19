@@ -16,7 +16,7 @@ dotfiles=()
 # Example format: plugins=(git lol)
 plugins=()
 
-source $YARRF/yarr.sh
+source $YARRF/yarrf.sh
 
 # Customize to your needs...
 
