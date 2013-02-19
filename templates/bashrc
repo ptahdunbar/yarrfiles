@@ -1,0 +1,25 @@
+# Path to the yarrfiles configuration.
+YARRF=$HOME/.yarrfiles
+
+# Customize your shell prompt.
+# Set the name of the theme to load.
+# Look in ~/.yarrfiles/themes/
+YARRF_THEME=''
+
+# Which dotfiles would you like to load? (dotfiles can be found in ~/.yarrfiles/dotfiles/*)
+# Dot files may be added to ~/.yarrfiles/custom/dotfiles/
+# Example format: dotfiles=(vim)
+dotfiles=()
+
+# Which plugins would you like to load? (plugins can be found in ~/.yarrfiles/plugins/*)
+# Custom plugins may be added to ~/.yarrfiles/custom/plugins/
+# Example format: plugins=(git lol)
+plugins=()
+
+source $YARRF/yarr.sh
+
+# Customize to your needs...
+
+# Example aliases
+# alias bashconfig='vi ~/.bashrc'
+
