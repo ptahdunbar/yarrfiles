@@ -19,6 +19,7 @@ plugins=()
 source $YARRF/yarrf.sh
 
 # Customize to your needs...
+alias shconfig='vi ~/.bashrc'
 
-# Example aliases
-# alias bashconfig='vi ~/.bashrc'
+# source ~/.localrc if available.
+[ -f ~/.localrc ] && source ~/.localrc;
