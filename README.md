@@ -12,7 +12,7 @@ Sail'n wit me booty across the seven seas.. Arr! Prepare to be Boarded!! -_O
 
 ### Manually via `git`
 
-`git clone http://github.com/ptahdunbar/yarrfiles.git ~/.yarrfiles` && `~/.yarrfiles/bin/yarrf --install`
+`git clone http://github.com/ptahdunbar/yarrfiles.git ~/.yarrfiles && ~/.yarrfiles/bin/yarrf --install`
 
 ###### Background
 - Upon installation, yarrfiles retrieves the current shell environment (suppots bash and zsh).
