@@ -12,7 +12,7 @@ Sail'n wit me booty across the seven seas.. Arr! Prepare to be Boarded!! -_O
 
 ### Via `git`
 
-`git clone git@github.com:ptahdunbar/yarrfiles.git ~/.yarrfiles && ~/.yarrfiles/bin/yarrf --init`
+`git clone git@github.com:ptahdunbar/yarrfiles.git ~/.yarrfiles && ~/.yarrfiles/bin/yarrfiles --init`
 
 ###### Background
 - Upon installation, yarrfiles retrieves the current shell environment (suppots bash and zsh).
@@ -21,7 +21,7 @@ Sail'n wit me booty across the seven seas.. Arr! Prepare to be Boarded!! -_O
 
 ## Update
 
-1. Yarr! `yarrf --update`
+1. Yarr! `yarrfiles --update`
 2. Arrr, set sail ye scury dogs!
 
 ###### Background
@@ -72,7 +72,7 @@ Sail'n wit me booty across the seven seas.. Arr! Prepare to be Boarded!! -_O
 
 ## Uninstall
 
-1. Run `~/.yarrfiles/bin/yarr --uninstall`
+1. Run `~/.yarrfiles/bin/yarrfiles --uninstall`
 2. Arrr, set sail ye scury dogs!
 
 ## Credits

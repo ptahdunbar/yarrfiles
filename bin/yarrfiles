@@ -72,8 +72,7 @@ uninstall() {
 	echo "Removing ${YARRF}"
 	echo
 	
-	if [[ -d $YARRF ]]
-	then
+	if [[ -d $YARRF ]]; then
 	  rm -rf $YARRF
 	fi
 
