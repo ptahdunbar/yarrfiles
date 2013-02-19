@@ -1,0 +1,148 @@
+#!/bin/sh
+
+# set the directory of Yarrfiles.
+YARRF='~/.yarrfiles'
+
+# get the current working directory so we can switch back if nessecary.
+CWD=`pwd`
+
+# installs yarrf
+install() {
+	echo
+	echo "Installing Yarrfiles!"
+	echo
+	
+	# clones the get repo.
+	csh=`basename $SHELL`
+	suffix='rc'
+	cshrc="$csh$suffix"
+
+	if [ -d $YARRF ]; then
+	    echo "Yarrfiles is already installed. You'll need to remove ~/${YARRF} if you'd like to install."
+	    exit
+	fi
+
+	echo "Cloning Yarrfiles..."
+	# hash git >/dev/null && /usr/bin/env git clone https://github.com/ptahdunbar/yarrfiles.git $YARRF || {
+	#    echo "git is not installed. installation failed."
+	#    exit
+	# }
+	
+	# Init submodules.
+	# cd $YARRF && git submodule init && git submodule foreach git pull origin master
+
+	echo "Looking for an existing ~/.$cshrc config..."
+	echo
+
+	if [ -f ~/.$cshrc ] || [ -h ~/.$cshrc ]; then
+	    echo "Found: ~/.${cshrc} —— Backing up to ~/.${cshrc}.pre-yarrfiles"
+	#    mv ~/.$cshrc ~/.$(cshrc).pre-yarrfiles
+	fi
+
+	echo "Using: ~/.yarrfiles/templates/.${cshrc} config —— adding it to ~/.${cshrc}"
+	#cp ~/.yarrfiles/templates/.$csh ~/.$cshrc
+	
+	# if bash_profile exists, cat 'source bashrc'.
+
+	echo "Sourced: ~/.${cshrc}"
+	#source $cshrc
+	
+	cd $CWD
+	
+	echo
+	echo "Yarr ye scury dog, installation successful! (-_O)"
+	echo
+}
+
+uninstall() {
+	echo
+	echo "Removing ${YARRF}"
+	echo
+	
+	if [[ -d $YARRF ]]
+	then
+	  rm -rf $YARRF
+	fi
+
+	echo "Looking for original zsh config..."
+	if [ -f ~/.zshrc.pre-yarrfiles ] || [ -h ~/.zshrc.pre-yarrfiles ]
+	then
+		echo "Found ~/.zshrc.pre-yarrfiles -- Restoring to ~/.zshrc";
+		if [ -f ~/.zshrc ] || [ -h ~/.zshrc ]
+		then
+			ZSHRC_SAVE=".zshrc.yarrfiles-uninstalled-`date +%Y%m%d%H%M%S`";
+			echo "Found ~/.zshrc -- Renaming to ~/${ZSHRC_SAVE}";
+			mv ~/.zshrc ~/${ZSHRC_SAVE};
+		fi
+	fi
+	
+	if [ -f ~/.zshrc.pre-yarrfiles ] || [ -h ~/.zshrc.pre-yarrfiles ]
+	then
+		mv ~/.zshrc.pre-yarrfiles ~/.zshrc;
+	fi
+	
+	echo "Looking for original bash config..."
+	if [ -f ~/.bashrc.pre-yarrfiles ] || [ -h ~/.bashrc.pre-yarrfiles ]
+	then
+		echo "Found ~/.bashrc.pre-yarrfiles -- Restoring to ~/.bashrc";
+		if [ -f ~/.bashrc ] || [ -h ~/.bashrc ]
+		then
+			BASHRC_SAVE=".bashrc.yarrfiles-uninstalled-`date +%Y%m%d%H%M%S`";
+			echo "Found ~/.bashrc -- Renaming to ~/${BASHRC_SAVE}";
+			mv ~/.bashrc ~/${BASHRC_SAVE};
+		fi
+	fi
+	
+	if [ -f ~/.bashrc.pre-yarrfiles ] || [ -h ~/.bashrc.pre-yarrfiles ]
+	then
+		mv ~/.bashrc.pre-yarrfiles ~/.zshrc;
+	fi
+
+	echo "Thanks for trying out Yarrfiles. It's been uninstalled."
+}
+
+update() {
+	echo
+	echo "Updating Yarrfiles!"
+	echo
+
+	cd $YARRF
+
+	if git pull && git submodule foreach git pull origin master; then
+		echo
+		echo "Yarr ye scury dog, update successful! (-_O)"
+		echo
+	else
+		echo "Arrgh matey, update failed! :/"
+	fi
+	
+	cd $CWD
+}
+
+# displays loaded scripts and plugins.
+status() {
+	echo "Status: command not yet implemented."
+}
+
+usage()
+{
+	echo "Usage: $0 --install|--update|--status|--uninstall|--usage"
+}
+
+case "$1" in
+--install|-i)
+	install
+	;;
+--update|-u)
+	update
+	;;
+--status|-s)
+	status
+	;;
+--uninstall|-rm)
+	uninstall
+	;;
+*)
+	usage
+	exit 1
+esac
