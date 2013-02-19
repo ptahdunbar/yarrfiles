@@ -24,7 +24,8 @@ Sail'n wit me booty across the seven seas.. Arr! Prepare to be Boarded!! -_O
 
 OPTIONS:
    -h|--help		Show this message
-   -i|--install		Install yarrfiles
+   --install		Downloads and installs yarrfiles
+   -i|init			Install yarrfiles
    -u|--update		Update yarrfiles via git
    -x|--uninstall	Uninstall yarrfiles
 
@@ -44,10 +45,6 @@ install() {
 	    echo "Yarrfiles is already installed. You'll need to remove ${YARRF} if you'd like to reinstall."
 	    exit
 	fi
-	
-	echo "install"
-	
-	exit
 
 	# If this is coming from a curl or wget
 	if [ $RAW -eq 1 ]; then
@@ -163,11 +160,11 @@ update() {
 while getopts ':hifux' OPTION
 do
 	case $OPTION in
-		i|install)
+		install)
 			RAW='1'
 			COMMAND='install'
 			;;
-		init)
+		i|init)
 			COMMAND='install'
 			;;
 		f|force)
