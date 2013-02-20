@@ -1,5 +1,8 @@
 # LOL!!1
-# Source: http://aur.archlinux.org/packages/lolbash/lolbash/lolbash.sh
+# Source: https://aur.archlinux.org/packages/lolbash/
+
+alias please='sudo'
+alias plz='sudo'
 
 alias wtf='dmesg'
 alias onoz='cat /var/log/errors.log'
