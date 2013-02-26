@@ -29,7 +29,7 @@ Sail'n wit me booty across the seven seas.. Arr! Prepare to be Boarded!! -_O
 
 ## Configration
 
-- Yarrfiles is completely controled by your shell configuration file (bashrc or zshrc).
+- Yarrfiles can be configured by your shell configuration file (bashrc or zshrc).
 
 ### Configuration Options
 - `YARRF_THEME`
@@ -74,6 +74,10 @@ Sail'n wit me booty across the seven seas.. Arr! Prepare to be Boarded!! -_O
 
 1. Run `~/.yarrfiles/bin/yarrfiles --uninstall`
 2. Arrr, set sail ye scury dogs!
+
+## Usage Notes
+- The general idea is to fork the repo and personalized it with your dotfiles, scripts, plugins, and executables.
+- Use custom for machine specific overrides & functionality as the folder is ignored by git.
 
 ## Credits
 - [Robby Russell](http://planetargon.com/who-we-are/robby-russell) for [Oh My Zsh](https://github.com/robbyrussell/oh-my-zsh)

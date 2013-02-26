@@ -6,36 +6,34 @@ YARRF=`echo /Users/$(whoami)/.yarrfiles`
 # get the current working directory so we can switch back if nessecary.
 CWD=`pwd`
 
-# Flag to determine what type of install were performing.
-RAW='0'
-
-VERBOSE='0'
-
-# Force a command to run.
-FORCE='0'
-
+# Get the current shell info
 CURRENT_SHELL=`basename $SHELL`
 CURRENT_SHELL_SUFFIX='rc'
 CURRENT_SHELL_CONFIG="${CURRENT_SHELL}${CURRENT_SHELL_SUFFIX}"
 
+TIMESTAMP=`date +%Y-%m-%d-%s`
+
 # Default command to run.
 COMMAND='usage'
+
+# Command options
+DOWNLOAD_YARRF='0' # Flag to determine whether to download yarrfiles upon installation/upgrade.
+VERBOSE='0' # Display additional output when running a command.
+FORCE='0' # Force a command to run.
 
 usage()
 {
 	cat <<USAGE
-Usage: yarrfiles options
+usage: yarrfiles [OPTIONS]
 
-Sail'n wit me booty across the seven seas.. Arr! Prepare to be Boarded!! -_O
-
-OPTIONS:
-   -h|--help		Show this message
-   --install		Downloads and installs yarrfiles
-   -init		Install yarrfiles
-   --update		Update yarrfiles via git
-   --load-dotfiles	Copy over enabled dotfiles
-   --revert-dotfiles	Reverts back to original dotfiles
-   --uninstall		Uninstall yarrfiles
+Options
+ -h			display this message
+ -v			increase verbosity
+ -f			force a command to run
+ -s			downloads yarrfiles and performs the install routine
+ -i			performs the install routine
+ -l			symlinks dotfiles to home dir
+ -d			deletes yarrfiles
 
 USAGE
 }
@@ -44,37 +42,35 @@ USAGE
 install_yarrfiles() {
 	echo "Installing Yarrfiles!"
 	echo
-	
-	if [ -d $YARRF ] && [ $FORCE == "0" ]; then
-	    echo "Yarrfiles is already installed. You'll need to remove ${YARRF} if you'd like to reinstall."
-	    exit
-	fi
 
 	# If this is coming from a curl or wget
-	if [ $RAW -eq 1 ]; then
+	if [[ $DOWNLOAD_YARRF -eq 1 ]]; then
+
+		if [[ -d $YARRF ]]; then
+		    echo "Yarrfiles is already installed. You'll need to remove ${YARRF} if you'd like to reinstall."
+		    exit
+		fi
+
 		download_yarrf_from_git_repo
 	fi
 
-	echo "Looking for an existing ~/.$CURRENT_SHELL_CONFIG config..."
-	if [ -f ~/.$CURRENT_SHELL_CONFIG ] || [ -h ~/.$CURRENT_SHELL_CONFIG ]; then
-	    echo "Found ~/.${CURRENT_SHELL_CONFIG} —— Backing up to ~/.${CURRENT_SHELL_CONFIG}.pre-yarrfiles"
+	if [[ -f ~/.$CURRENT_SHELL_CONFIG ]] || [[ -h ~/.$CURRENT_SHELL_CONFIG ]]; then
+	    echo "Found existing ~/.${CURRENT_SHELL_CONFIG} —— Backing up to ~/.${CURRENT_SHELL_CONFIG}.pre-yarrfiles"
 		mv ~/.${CURRENT_SHELL_CONFIG} ~/.${CURRENT_SHELL_CONFIG}.pre-yarrfiles
 	fi
 
-	echo "Using ~/.yarrfiles/templates/.${CURRENT_SHELL_CONFIG} config —— adding it to ~/.${CURRENT_SHELL_CONFIG}"
+	echo "Using ~/.yarrfiles/templates/.${CURRENT_SHELL_CONFIG} —— adding to ~/.${CURRENT_SHELL_CONFIG}"
 	cp ~/.yarrfiles/templates/$CURRENT_SHELL_CONFIG ~/.$CURRENT_SHELL_CONFIG
+
+	PATH=$(printf '%s\n' $PATH | sort -u)
 	
 	echo "Copying your current PATH and adding it to the end of ~/.${CURRENT_SHELL_CONFIG} for you."
 	echo "export PATH=${PATH}:${YARRF}/bin:${YARRF}/custom/bin" >> ~/.${CURRENT_SHELL_CONFIG}
 
 	# bash_profile updates
-	if [ $CURRENT_SHELL == 'bash' ]; then
+	if [[ $CURRENT_SHELL == 'bash' ]]; then
 		echo "Sourcing ~/.bashrc in ~/.bash_profile"
-		echo "source ~/.bashrc" >> ~/.bash_profile
-	fi
-
-	if [ $RAW -eq 0 ]; then
-		load_dotfiles
+		echo "[ -e ~/.bashrc ] && source ~/.bashrc" >> ~/.bash_profile
 	fi
 
 	cd $CWD
@@ -83,7 +79,7 @@ install_yarrfiles() {
 	echo "Ye scury dog, installation successful! (-_O)"
 	echo
 
-	source ~/.$CURRENT_SHELL_CONFIG
+	load_dotfiles
 }
 
 download_yarrf_from_git_repo() {
@@ -102,7 +98,7 @@ uninstall_yarrfiles() {
 	echo "Removing ${YARRF}"
 
 	read -p "Are you sure you want to continue? (y|N) "
-	[ "$REPLY" != "y" ] && echo "Aborting..."; exit
+	[[ $REPLY != 'y' ]] && echo "Aborting..."; exit
 	
 	if [[ -d $YARRF ]]; then
 	  rm -rf $YARRF
@@ -147,7 +143,7 @@ uninstall_yarrfiles() {
 	echo "Thanks for trying out Yarrfiles. It's been uninstalled."
 }
 
-update_yarrfiles() {
+upgrade_yarrfiles() {
 	echo "Updating Yarrfiles!"
 
 	cd $YARRF
@@ -169,34 +165,39 @@ load_dotfiles() {
 
 	# load the dotfiles variable
 	source ~/.$CURRENT_SHELL_CONFIG
-	
+
 	dotters=()
+	
+	[[ $VERBOSE -eq 1 ]] && [[ ${dotfiles[@]} == '' ]] && echo "No plugins enabled."
 
 	# load all enabled dotfiles and attempt to copy them over to the home dir.
 	for slug in "${dotfiles[@]}"; do
 		if [[ -d $YARRF_CUSTOM/dotfiles/$slug ]]; then
-			for dotter in $YARRF_CUSTOM/dotfiles/$slug/*; do
+			for dotter in $YARRF_CUSTOM/dotfiles/$slug/.*; do
 				dotters=($dotter $dotters)
 			done
 		elif [[ -d $YARRF/dotfiles/$slug ]]; then
-			for dotter in $YARRF/dotfiles/$slug/*; do
+			for dotter in $YARRF/dotfiles/$slug/.*; do
 				dotters=($dotter $dotters)
 			done
 		fi
 	done
-	
+
 	for dotfile in ${dotters[@]}; do
 		local base_slug=`basename $dotfile`
-		if [[ -e ~/$base_slug ]]; then
-			[[ $VERBOSE -eq 1 ]] && echo "[backup] ~/$base_slug to ~/$base_slug.bak-yarrfiles"
-			cp -R ~/$base_slug ~/$base_slug.bak-yarrfiles
-		fi
-		
 		local path=(${dotfile//.yarrfiles/ })
+		[[ -d $dotfile ]] && dotfile="$dotfile/" && base_slug="$base_slug"
 
-		[[ $VERBOSE -eq 1 ]] && echo "[loaded] ${path[1]}/$base_slug"
+		if [[ -e ~/$base_slug ]]; then
+			[[ $VERBOSE -eq 1 ]] && echo "Moved ~/$base_slug to ~/$base_slug.dotbak-yarrfiles.$TIMESTAMP"
+			mv -f ~/$base_slug ~/$base_slug.dotbak-yarrfiles.$TIMESTAMP
+		fi
 
-		cp -R $dotfile ~/
+		if [[ $VERBOSE -eq 1 ]]; then
+			test -f $dotfile && echo "[symlink] ${path[1]}/$base_slug" || echo "[symlink] ${path[1]}"
+		fi
+
+		ln -s $dotfile ~/$base_slug
 	done
 }
 
@@ -204,48 +205,40 @@ revert_dotfiles() {
 	shopt -s dotglob
 	shopt -s nullglob
 
-	dotfiles=(*.bak-yarrfiles)
+	dotfiles=(*.dotbak-yarrfiles.*)
 	for restore in ${dotfiles[@]}; do
-		local slug=(${restore//.bak-yarrfiles/ })
+		local slug=(${restore//.dotbak-yarrfiles/ })
 		local path=${slug[0]}
 		[[ $VERBOSE -eq 1 ]] && echo "Restoring ${restore} to ~/$path"
 
-		if [[ -f ~/$path ]]; then
-			rm ~/$path
-		elif [[ -d ~/$path ]]; then
-			rmdir ~/$path
-		fi
+		unlink ~/$path
 
-		mv -f $restore ~/$path
+		mv $restore ~/$path
 	done
 }
 
-while getopts ':hivdfuxr' OPTION
-do
-	case $OPTION in
+while getopts ':hvfsiudl' OPTION; do
+	case "$OPTION" in
 		f|force)
 			FORCE='1'
 			;;
 		v|verbose)
 			VERBOSE='1'
 			;;
-		install)
-			RAW='1'
+		s|setup)
+			DOWNLOAD_YARRF='1'
+			COMMAND='install_yar`rfiles'
+			;;
+		i|init)
 			COMMAND='install_yarrfiles'
 			;;
-		init)
-			COMMAND='install_yarrfiles'
-			;;
-		load-dotfiles)
+		l|load-dotfiles)
 			COMMAND='load_dotfiles'
 			;;
-		revert-dotfiles)
-			COMMAND='revert_dotfiles'
+		u|upgrade)
+		 	COMMAND='upgrade_yarrfiles'
 			;;
-		update)
-		 	COMMAND='update_yarrfiles'
-			;;
-		uninstall)
+		d|delete)
 			COMMAND='uninstall_yarrfiles'
 			;;
      esac
@@ -253,4 +246,21 @@ done
 
 $COMMAND
 
-exit 1
+exit 0
+
+# TODO
+# build a function that parses params and outputs: $COMMAND $ARGS
+
+# uninstall, but dont delete yarrfiles?
+
+# install with presets
+# yarrfiles -i -p foo,bar,baz -d vim,tmux
+
+# source a plugin (in current session only)
+# enable -p slug
+
+# copy over a dotfile (in current session only)
+# enable -d slug
+
+# removes a dotfile (in current session only)
+# disable -d slug

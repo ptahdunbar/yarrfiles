@@ -4,8 +4,13 @@
 shopt -s dotglob
 shopt -s nullglob
 
+# Set the operating system global
+[ 'Darwin' == `uname` ] && YARRF_OS='osx' || [ 'Linux' == `uname` ] && YARRF_OS='linux' || YARRF_OS='yarr'
+export YARRF_OS=$YARRF_OS;
+
 # Get the current shell
 CSHELL=`basename $SHELL`
+export YARRF_SH=$CSHELL
 
 # Set ZSH_CUSTOM to the path where your custom config files
 # and plugins exists, or else we will use the default custom/
@@ -38,6 +43,7 @@ fi
 
 # load all custom scripts
 for script in ${YARRF_CUSTOM}/*.{sh,${CSHELL}}; do
+	echo "source $script"
 	source $script
 done
 
@@ -60,16 +66,3 @@ for plugin in "${plugins[@]}"; do
 		echo "[yarrfiles] Plugin not found: ${plugin}"
 	fi
 done
-
-# Load the theme
-if [[ ! $YARRF_THEME = "" ]]; then
-	if [ -f "$YARRF_CUSTOM/$YARRF_THEME.$CSHELL-theme" ]; then
-		source "$YARRF_CUSTOM/$YARRF_THEME.$CSHELL-theme"
-	elif [ -f "$YARRF_CUSTOM/$YARRF_THEME.sh-theme" ]; then
-		source "$YARRF_CUSTOM/$YARRF_THEME.sh-theme"
-	elif [ -f "$YARRF/themes/$YARRF_THEME.$CSHELL-theme" ]; then
-		source "$YARRF/themes/$YARRF_THEME.$CSHELL-theme"
-	elif [ -f "$YARRF/themes/$YARRF_THEME.sh-theme" ]; then
-		source "$YARRF/themes/$YARRF_THEME.sh-theme"
-	fi
-fi
