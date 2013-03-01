@@ -1,2 +1,4 @@
 custom/*
 !custom/example.sh
+!custom/prompt.sh
+!custom/legacy.sh
