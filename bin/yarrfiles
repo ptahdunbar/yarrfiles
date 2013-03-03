@@ -52,6 +52,9 @@ install_yarrfiles() {
 		fi
 
 		download_yarrf_from_git_repo
+
+	else
+		update_submodules
 	fi
 
 	if [[ -f ~/.$CURRENT_SHELL_CONFIG ]] || [[ -h ~/.$CURRENT_SHELL_CONFIG ]]; then
@@ -89,8 +92,11 @@ download_yarrf_from_git_repo() {
 	   exit
 	}
 
-	# Init submodules.
-	cd $YARRF && git submodule init && git submodule foreach git pull origin master
+	update_submodules
+}
+
+update_submodules() {
+	git clone git://github.com/ptahdunbar/yarrfiles.git ~/.yarrfiles && ~/.yarrfiles/bin/yarrfiles -i
 }
 
 # TODO Refactor function
