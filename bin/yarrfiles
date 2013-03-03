@@ -174,18 +174,20 @@ load_dotfiles() {
 	for slug in "${dotfiles[@]}"; do
 		if [[ -d $YARRF_CUSTOM/dotfiles/$slug ]]; then
 			for dotter in $YARRF_CUSTOM/dotfiles/$slug/.*; do
-				dotters=($dotter $dotters)
+				[[ ! -s $dotter ]] && dotters[$[${#dotters[@]}+1]]=$dotter
 			done
 		elif [[ -d $YARRF/dotfiles/$slug ]]; then
 			for dotter in $YARRF/dotfiles/$slug/.*; do
-				dotters=($dotter $dotters)
+				[[ ! -s $dotter ]] && dotters[$[${#dotters[@]}+1]]=$dotter
 			done
 		fi
 	done
 
 	for dotfile in ${dotters[@]}; do
-		local base_slug=`basename $dotfile`
-		local path=(${dotfile//.yarrfiles/ })
+		[[ -s $dotfile ]] && continue 
+
+		base_slug=`basename $dotfile`
+		path=(${dotfile//.yarrfiles/ })
 		[[ -d $dotfile ]] && dotfile="$dotfile/" && base_slug="$base_slug"
 
 		if [[ -e ~/$base_slug ]]; then
