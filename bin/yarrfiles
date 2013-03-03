@@ -96,7 +96,8 @@ download_yarrf_from_git_repo() {
 }
 
 update_submodules() {
-	git clone git://github.com/ptahdunbar/yarrfiles.git ~/.yarrfiles && ~/.yarrfiles/bin/yarrfiles -i
+	cd $YARRF && git submodule init && git submodule foreach git pull origin master
+	cd $CWD
 }
 
 # TODO Refactor function
